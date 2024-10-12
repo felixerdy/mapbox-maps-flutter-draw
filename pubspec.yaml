@@ -1,6 +1,6 @@
 name: mapbox_maps_flutter_draw
 description: "A Flutter package to draw, edit, and delete polygons using the mapbox_maps_flutter library."
-version: 0.0.1
+version: 0.1.0
 repository: https://github.com/felixerdy/mapbox-maps-flutter-draw
 
 environment:
