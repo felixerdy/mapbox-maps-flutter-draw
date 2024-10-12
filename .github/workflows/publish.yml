@@ -19,6 +19,7 @@ jobs:
           VERSION=${TAG_NAME:1} # Remove the leading 'v'
           echo "Updating pubspec.yaml version to $VERSION"
           sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
+          echo "VERSION=$VERSION" >> $GITHUB_ENV # Set the VERSION as an environment variable
           
       - name: Set up Git
         run: |
@@ -26,7 +27,7 @@ jobs:
           git config --local user.email "github-actions@github.com"
           git add pubspec.yaml
           git commit -m "Update version to $VERSION" || echo "No changes to commit"
-          git push
+          git push origin HEAD:main
 
       - uses: dart-lang/setup-dart@v1
       - uses: flutter-actions/setup-flutter@v3
