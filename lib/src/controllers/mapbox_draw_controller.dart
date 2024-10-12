@@ -107,16 +107,6 @@ class MapboxDrawController with ChangeNotifier {
     toggleEditing(EditingMode.DELETE);
   }
 
-  /// Adds existing polygons by delegating to PolygonHandler.
-  Future<void> addPolygons(List<Polygon> existingPolygons) async {
-    await _polygonHandler.add(existingPolygons);
-  }
-
-  /// Retrieves all polygons by delegating to PolygonHandler.
-  List<Polygon> getAllPolygons() {
-    return _polygonHandler.getAll();
-  }
-
   /// Adds existing points by delegating to PointHandler.
   Future<void> addPoints(List<Point> existingPoints) async {
     await _pointHandler.addPoints(existingPoints);
@@ -127,9 +117,22 @@ class MapboxDrawController with ChangeNotifier {
     return _pointHandler.getAllPoints();
   }
 
-  /// Deletes a specific point by delegating to PointHandler.
-  Future<void> deletePoint(CircleAnnotation point) async {
-    await _pointHandler.deletePoint(point);
+  Future<void> addLines(List<LineString> lines) async {
+    await _lineHandler.addLines(lines);
+  }
+
+  List<LineString> getAllLines() {
+    return _lineHandler.getAllLines();
+  }
+
+  /// Adds existing polygons by delegating to PolygonHandler.
+  Future<void> addPolygons(List<Polygon> existingPolygons) async {
+    await _polygonHandler.add(existingPolygons);
+  }
+
+  /// Retrieves all polygons by delegating to PolygonHandler.
+  List<Polygon> getAllPolygons() {
+    return _polygonHandler.getAll();
   }
 
   /// Undo the last action by delegating to the appropriate handler

@@ -128,6 +128,24 @@ class LineHandler extends ChangeNotifier {
     }
   }
 
+  Future<void> addLines(List<LineString> existingLines) async {
+    for (var line in existingLines) {
+      try {
+        final newLine = await _PolylineAnnotationManager!.create(
+          PolylineAnnotationOptions(geometry: line),
+        );
+
+        lines.add(newLine);
+      } catch (e) {
+        print('Error adding existing line: $e');
+      }
+    }
+  }
+
+  List<LineString> getAllLines() {
+    return lines.map((line) => line.geometry).toList();
+  }
+
   /// Deletes a line annotation.
   Future<void> deleteLine(PolylineAnnotation line) async {
     try {
