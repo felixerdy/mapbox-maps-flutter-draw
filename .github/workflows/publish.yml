@@ -15,7 +15,7 @@ jobs:
       # Checkout repository
       - uses: actions/checkout@v4
       # Setup Dart SDK with JWT token
-      - uses: dart-lang/setup-dart@v1
+      - uses: flutter-actions/setup-flutter@v3
       # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: flutter pub get
