@@ -13,7 +13,7 @@ class LineHandler extends ChangeNotifier {
 
   // Annotation Managers
   CircleAnnotationManager? _circleAnnotationManager;
-  PolylineAnnotationManager? _PolylineAnnotationManager;
+  PolylineAnnotationManager? _polylineAnnotationManager;
 
   LineHandler(this._controller);
 
@@ -30,15 +30,15 @@ class LineHandler extends ChangeNotifier {
       ..setCircleStrokeWidth(2)
       ..setCircleRadius(6);
 
-    _PolylineAnnotationManager = await mapController.annotations
+    _polylineAnnotationManager = await mapController.annotations
         .createPolylineAnnotationManager(below: 'mapbox_draw_line_circles');
 
-    _PolylineAnnotationManager!
+    _polylineAnnotationManager!
       ..setLineEmissiveStrength(1)
       ..setLineColor(Colors.green.value)
       ..setLineWidth(4);
 
-    _PolylineAnnotationManager!.addOnPolylineAnnotationClickListener(
+    _polylineAnnotationManager!.addOnPolylineAnnotationClickListener(
         _PolylineAnnotationClickListener(this));
 
     // Register LineHandler tap listener
@@ -64,7 +64,7 @@ class LineHandler extends ChangeNotifier {
 
     try {
       // Create the final line
-      final newLine = await _PolylineAnnotationManager!.create(
+      final newLine = await _polylineAnnotationManager!.create(
         PolylineAnnotationOptions(
           geometry: LineString.fromPoints(points: _linePoints),
         ),
@@ -111,13 +111,13 @@ class LineHandler extends ChangeNotifier {
       if (_linePoints.length >= 2) {
         // Create or update the line with new points
         if (_currentLine == null) {
-          _currentLine = await _PolylineAnnotationManager!.create(
+          _currentLine = await _polylineAnnotationManager!.create(
             PolylineAnnotationOptions(
                 geometry: LineString.fromPoints(points: _linePoints)),
           );
         } else {
           _currentLine?.geometry = LineString.fromPoints(points: _linePoints);
-          await _PolylineAnnotationManager!.update(_currentLine!);
+          await _polylineAnnotationManager!.update(_currentLine!);
         }
       }
       _controller.notifyListeners();
@@ -131,7 +131,7 @@ class LineHandler extends ChangeNotifier {
   Future<void> addLines(List<LineString> existingLines) async {
     for (var line in existingLines) {
       try {
-        final newLine = await _PolylineAnnotationManager!.create(
+        final newLine = await _polylineAnnotationManager!.create(
           PolylineAnnotationOptions(geometry: line),
         );
 
@@ -149,8 +149,8 @@ class LineHandler extends ChangeNotifier {
   /// Deletes a line annotation.
   Future<void> deleteLine(PolylineAnnotation line) async {
     try {
-      if (_PolylineAnnotationManager != null) {
-        await _PolylineAnnotationManager!.delete(line);
+      if (_polylineAnnotationManager != null) {
+        await _polylineAnnotationManager!.delete(line);
         lines.removeWhere((ln) => ln.id == line.id);
         _controller.notifyListeners();
         print('Line deleted: $line');
@@ -178,11 +178,11 @@ class LineHandler extends ChangeNotifier {
       if (_linePoints.length >= 2) {
         // Update the line with the remaining points
         _currentLine?.geometry = LineString.fromPoints(points: _linePoints);
-        await _PolylineAnnotationManager!.update(_currentLine!);
+        await _polylineAnnotationManager!.update(_currentLine!);
       } else {
         // If less than 2 points, remove the line completely
         if (_currentLine != null) {
-          await _PolylineAnnotationManager!.delete(_currentLine!);
+          await _polylineAnnotationManager!.delete(_currentLine!);
           _currentLine = null;
         }
       }
@@ -200,7 +200,7 @@ class LineHandler extends ChangeNotifier {
   void dispose() {
     super.dispose();
     MapTapHandler().removeTapListener(_onMapTapListener);
-    _PolylineAnnotationManager?.deleteAll();
+    _polylineAnnotationManager?.deleteAll();
     _circleAnnotationManager?.deleteAll();
   }
 }

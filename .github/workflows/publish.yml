@@ -12,9 +12,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Update pubspec.yaml version
+        run: |
+          TAG_NAME=${{ github.ref_name }}
+          VERSION=${TAG_NAME:1} # Remove the leading 'v'
+          echo "Updating pubspec.yaml version to $VERSION"
+          sed -i '' "s/^version: .*/version: $VERSION/" pubspec.yaml
+          
+      - name: Set up Git
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add pubspec.yaml
+          git commit -m "Update version to $VERSION" || echo "No changes to commit"
+          git push
+
       - uses: dart-lang/setup-dart@v1
       - uses: flutter-actions/setup-flutter@v3
+
       - name: Install dependencies
         run: flutter pub get
+
       - name: Publish
         run: flutter pub publish --force
