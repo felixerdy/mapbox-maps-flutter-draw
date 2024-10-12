@@ -22,6 +22,9 @@ A Flutter package to draw, edit, and delete polygons on a Mapbox map using the [
 - **Undo Last Point**: Undo the last point added while drawing a polygon.
 - **Manage Multiple Polygons**: Store and retrieve multiple polygons.
 
+
+<img style="max-width: 300px" src="./doc/example.png" />
+
 ## Getting started
 
 To use this package, add `mapbox_maps_flutter_draw` and its dependencies to your `pubspec.yaml` file:

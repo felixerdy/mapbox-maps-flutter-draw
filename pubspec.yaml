@@ -1,7 +1,7 @@
 name: mapbox_maps_flutter_draw
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
+repository: https://github.com/felixerdy/mapbox-maps-flutter-draw
 
 environment:
   sdk: ^3.5.3
