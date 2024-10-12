@@ -46,7 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     _mapboxDrawController = Provider.of<MapboxDrawController>(context);
 
-    MapboxOptions.setAccessToken("YOUR_MAPBOX_ACCESS_TOKEN");
+    MapboxOptions.setAccessToken(
+        "pk.eyJ1IjoiZmVsaXhhZXRlbSIsImEiOiI2MmE4YmQ4YjIzOTI2YjY3ZWFmNzUwOTU5NzliOTAxOCJ9.nshlehFGmK_6YmZarM2SHA");
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 '{"type":"Polygon","bbox":null,"coordinates":[[[19.172957996449043,49.30508658266342],[12.380430916160435,33.47371340190411],[-2.592100951914972,35.36674553163404],[0.04248170102297877,51.60826115068258]]]}'
               ];
 
-              _mapboxDrawController.add(
+              _mapboxDrawController.addPolygons(
                 polygonString
                     .map((e) => Polygon.fromJson(jsonDecode(e)))
                     .toList(),
@@ -77,36 +78,61 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Row(
-                  children: [
-                    if (_mapboxDrawController.editingMode ==
-                        EditingMode.DRAW_POLYGON)
-                      IconButton.filled(
-                        icon: const Icon(Icons.undo),
-                        onPressed: (_mapboxDrawController.polygonPoints.isEmpty)
-                            ? null
-                            : () => _mapboxDrawController.undoLastPoint(),
-                      ),
-                    _mapboxDrawController.editingMode ==
-                            EditingMode.DRAW_POLYGON
-                        ? IconButton.filled(
-                            icon: _mapboxDrawController.editingMode ==
-                                    EditingMode.DRAW_POLYGON
-                                ? const Icon(Icons.done)
-                                : const Icon(Icons.add),
-                            onPressed: () =>
-                                _mapboxDrawController.toggleEditing(),
-                          )
-                        : IconButton.outlined(
-                            icon: _mapboxDrawController.editingMode ==
-                                    EditingMode.DRAW_POLYGON
-                                ? const Icon(Icons.done)
-                                : const Icon(Icons.add),
-                            onPressed: () =>
-                                _mapboxDrawController.toggleEditing(),
-                          ),
-                  ],
+                IconButton.filled(
+                  icon: const Icon(Icons.undo),
+                  onPressed: () => _mapboxDrawController.undoLastAction(),
                 ),
+                _mapboxDrawController.editingMode == EditingMode.DRAW_POINT
+                    ? IconButton.filled(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_POINT
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.radio_button_checked),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_POINT),
+                      )
+                    : IconButton.outlined(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_POINT
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.radio_button_checked),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_POINT),
+                      ),
+                _mapboxDrawController.editingMode == EditingMode.DRAW_LINE
+                    ? IconButton.filled(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_LINE
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.timeline),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_LINE),
+                      )
+                    : IconButton.outlined(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_LINE
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.timeline),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_LINE),
+                      ),
+                _mapboxDrawController.editingMode == EditingMode.DRAW_POLYGON
+                    ? IconButton.filled(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_POLYGON
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.crop_square_outlined),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_POLYGON),
+                      )
+                    : IconButton.outlined(
+                        icon: _mapboxDrawController.editingMode ==
+                                EditingMode.DRAW_POLYGON
+                            ? const Icon(Icons.done)
+                            : const Icon(Icons.crop_square_outlined),
+                        onPressed: () => _mapboxDrawController
+                            .toggleEditing(EditingMode.DRAW_POLYGON),
+                      ),
                 _mapboxDrawController.editingMode == EditingMode.DELETE
                     ? IconButton.filled(
                         icon: const Icon(Icons.delete),
