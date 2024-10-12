@@ -7,20 +7,14 @@ on:
 
 jobs:
   publish:
-    name: 'Publish to pub.dev'
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write # Required for authentication using OIDC
     runs-on: ubuntu-latest
     steps:
-      # Checkout repository
-      - uses: actions/checkout@v4
-      # Setup Dart SDK with JWT token
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
       - uses: flutter-actions/setup-flutter@v3
-      # Minimal package setup and dry run checks.
       - name: Install dependencies
         run: flutter pub get
-      - name: Publish - dry run
-        run: flutter pub publish --dry-run
-      # Publishing...
-      - name: Publish to pub.dev
-        run: flutter pub publish -f
+      - name: Publish
+        run: flutter pub publish --force
