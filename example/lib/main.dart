@@ -46,8 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     _mapboxDrawController = Provider.of<MapboxDrawController>(context);
 
-    MapboxOptions.setAccessToken(
-        "pk.eyJ1IjoiZmVsaXhhZXRlbSIsImEiOiI2MmE4YmQ4YjIzOTI2YjY3ZWFmNzUwOTU5NzliOTAxOCJ9.nshlehFGmK_6YmZarM2SHA");
+    MapboxOptions.setAccessToken("YOUR_MAPBOX_ACCESS_TOKEN");
 
     return Scaffold(
       appBar: AppBar(
