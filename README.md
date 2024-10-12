@@ -89,7 +89,20 @@ Widget build(BuildContext context) {
 ```
 
 ## API Overview
-To be updated
+
+### MapboxDrawController
+- **`initialize(MapboxMap mapController)`**: Initializes the controller with a Mapbox map instance and sets up the point, line, and polygon handlers.
+- **`toggleEditing(EditingMode mode)`**: Toggles the editing state and delegates to the appropriate handler based on the specified editing mode.
+- **`toggleDeleteMode()`**: Toggles delete mode, which allows for deletion of points, lines, or polygons.
+- **`addPoints(List<Point> existingPoints)`**: Adds existing points to the map by delegating to the `PointHandler`.
+- **`getAllPoints()`**: Retrieves all points currently stored by delegating to the `PointHandler`.
+- **`addLines(List<LineString> lines)`**: Adds existing lines to the map by delegating to the `LineHandler`.
+- **`getAllLines()`**: Retrieves all lines currently stored by delegating to the `LineHandler`.
+- **`addPolygons(List<Polygon> existingPolygons)`**: Adds existing polygons to the map by delegating to the `PolygonHandler`.
+- **`getAllPolygons()`**: Retrieves all polygons currently stored by delegating to the `PolygonHandler`.
+- **`undoLastAction()`**: Undoes the last action performed based on the current editing mode, delegating to the appropriate handler.
+- **`dispose()`**: Cleans up the annotation managers for points, lines, and polygons when the controller is no longer needed.
+
 
 ## License
 This package is licensed under the [MIT License](./LICENSE).
