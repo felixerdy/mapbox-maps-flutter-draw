@@ -23,7 +23,7 @@ A Flutter package to draw, edit, and delete points, lines, and polygons on a Map
 - **Manage Geometries**: Store and retrieve multiple geometries.
 
 
-<img width="300px" src="./doc/example.png" />
+<img width="300px" src="https://github.com/felixerdy/mapbox-maps-flutter-draw/blob/main/doc/example.png?raw=true" />
 
 ## Getting started
 
