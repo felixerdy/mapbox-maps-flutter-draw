@@ -35,7 +35,8 @@ class MapboxDrawController with ChangeNotifier {
 
   /// Initializes the controller with a MapboxMap instance.
   Future<void> initialize(MapboxMap mapController,
-      {GeometryStyles? styles}) async {
+      {Function(GeometryChangeEvent event)? onChange,
+      GeometryStyles? styles}) async {
     _setLoading(true);
     notifyListeners();
 
@@ -45,11 +46,11 @@ class MapboxDrawController with ChangeNotifier {
 
     try {
       await _pointHandler.initialize(mapController,
-          style: geometryStyles.pointStyle);
+          style: geometryStyles.pointStyle, onChange: onChange);
       await _lineHandler.initialize(mapController,
-          style: geometryStyles.lineStyle);
+          style: geometryStyles.lineStyle, onChange: onChange);
       await _polygonHandler.initialize(mapController,
-          style: geometryStyles.polygonStyle);
+          style: geometryStyles.polygonStyle, onChange: onChange);
 
       mapController.setOnMapTapListener(MapTapHandler().handleMapTap);
     } catch (e) {

@@ -15,11 +15,17 @@ class PolygonHandler extends GeometryHandler {
   CircleAnnotationManager? _circleAnnotationManager;
   PolygonAnnotationManager? _polygonAnnotationManager;
 
+  Function(GeometryChangeEvent event)? onChange;
+
   PolygonHandler(this._controller) : super(_controller);
 
   /// Initializes polygon-related annotation managers.
+  @override
   Future<void> initialize(MapboxMap mapController,
-      {GeometryStyle? style}) async {
+      {GeometryStyle? style,
+      Function(GeometryChangeEvent event)? onChange}) async {
+    this.onChange = onChange;
+
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_polygon_circles');
 
@@ -109,6 +115,13 @@ class PolygonHandler extends GeometryHandler {
       _polygonPoints.clear();
       _currentPolygon = null;
 
+      if (onChange != null) {
+        onChange!(GeometryChangeEvent(
+          changeType: GeometryChangeType.add,
+          geometryType: GeometryType.polygon,
+        ));
+      }
+
       _controller.notifyListeners();
     } catch (e) {
       print('Error finalizing polygon: $e');
@@ -117,14 +130,10 @@ class PolygonHandler extends GeometryHandler {
 
   /// Handles map tap events to add points to the polygon.
   Future<void> _onMapTapListener(MapContentGestureContext context) async {
-    print('Polygon points: $_polygonPoints');
-
     if (_controller.editingMode != EditingMode.DRAW_POLYGON ||
         _controller.isLoading) {
       return; // Only add points when in draw polygon mode and not loading
     }
-
-    print('Adding polygon point: ${context.point}');
 
     _controller._setLoading(true);
     _polygonPoints.add(context.point);
@@ -132,8 +141,6 @@ class PolygonHandler extends GeometryHandler {
 
     try {
       if (_polygonPoints.length > 2) {
-        print('Updating polygon with ${_polygonPoints.length} points');
-
         // Create polygon if it doesn't exist
         _currentPolygon ??= await _polygonAnnotationManager!.create(
           PolygonAnnotationOptions(
@@ -168,8 +175,15 @@ class PolygonHandler extends GeometryHandler {
       if (_polygonAnnotationManager != null) {
         await _polygonAnnotationManager!.delete(polygon);
         polygons.removeWhere((poly) => poly.id == polygon.id);
+
+        if (onChange != null) {
+          onChange!(GeometryChangeEvent(
+            changeType: GeometryChangeType.delete,
+            geometryType: GeometryType.polygon,
+          ));
+        }
+
         _controller.notifyListeners();
-        print('Polygon deleted: $polygon');
       }
     } catch (e) {
       print('Error deleting polygon: $e');

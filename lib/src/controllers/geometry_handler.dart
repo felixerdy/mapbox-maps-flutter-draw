@@ -7,7 +7,8 @@ abstract class GeometryHandler extends ChangeNotifier {
 
   GeometryHandler(this.controller);
 
-  Future<void> initialize(MapboxMap mapController, {GeometryStyle? style});
+  Future<void> initialize(MapboxMap mapController,
+      {GeometryStyle? style, Function(GeometryChangeEvent event)? onChange});
 
   Future<void> startDrawing();
 

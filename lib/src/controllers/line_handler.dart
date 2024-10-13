@@ -15,12 +15,17 @@ class LineHandler extends GeometryHandler {
   CircleAnnotationManager? _circleAnnotationManager;
   PolylineAnnotationManager? _polylineAnnotationManager;
 
+  Function(GeometryChangeEvent event)? onChange;
+
   LineHandler(this._controller) : super(_controller);
 
   /// Initializes line-related annotation managers.
   @override
   Future<void> initialize(MapboxMap mapController,
-      {GeometryStyle? style}) async {
+      {GeometryStyle? style,
+      Function(GeometryChangeEvent event)? onChange}) async {
+    this.onChange = onChange;
+
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_line_circles');
 
@@ -50,6 +55,7 @@ class LineHandler extends GeometryHandler {
   }
 
   /// Starts the line drawing process.
+  @override
   Future<void> startDrawing() async {
     // Reset any existing drawing state
     _linePoints.clear();
@@ -60,6 +66,7 @@ class LineHandler extends GeometryHandler {
   }
 
   /// Finishes the line drawing process.
+  @override
   Future<void> finishDrawing() async {
     if (_linePoints.length < 2) {
       print('A line requires at least 2 points.');
@@ -82,6 +89,12 @@ class LineHandler extends GeometryHandler {
       _linePoints.clear();
       _currentLine = null;
 
+      if (onChange != null) {
+        onChange!(GeometryChangeEvent(
+            changeType: GeometryChangeType.add,
+            geometryType: GeometryType.line));
+      }
+
       _controller.notifyListeners();
     } catch (e) {
       print('Error finalizing line: $e');
@@ -90,14 +103,10 @@ class LineHandler extends GeometryHandler {
 
   /// Handles map tap events to add points to the line.
   Future<void> _onMapTapListener(MapContentGestureContext context) async {
-    print('Line points: $_linePoints');
-
     if (_controller.editingMode != EditingMode.DRAW_LINE ||
         _controller.isLoading) {
       return; // Only add points when in draw line mode and not loading
     }
-
-    print('Adding line point: ${context.point}');
 
     _controller._setLoading(true);
     _linePoints.add(context.point);
@@ -156,8 +165,14 @@ class LineHandler extends GeometryHandler {
       if (_polylineAnnotationManager != null) {
         await _polylineAnnotationManager!.delete(line);
         lines.removeWhere((ln) => ln.id == line.id);
+
+        if (onChange != null) {
+          onChange!(GeometryChangeEvent(
+              changeType: GeometryChangeType.delete,
+              geometryType: GeometryType.line));
+        }
+
         _controller.notifyListeners();
-        print('Line deleted: $line');
       }
     } catch (e) {
       print('Error deleting line: $e');

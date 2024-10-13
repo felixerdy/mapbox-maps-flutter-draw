@@ -11,5 +11,6 @@ part 'controllers/map_tap_handler.dart';
 part 'controllers/geometry_handler.dart';
 
 part 'models/geometry_styles.dart';
+part 'models/geometry_change_event.dart';
 
 // You can also include other shared utilities or models here if needed

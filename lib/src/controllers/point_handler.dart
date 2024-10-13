@@ -11,12 +11,17 @@ class PointHandler extends GeometryHandler {
   // Annotation Manager
   CircleAnnotationManager? _circleAnnotationManager;
 
+  Function(GeometryChangeEvent event)? onChange;
+
   PointHandler(this._controller) : super(_controller);
 
   /// Initializes point-related annotation managers.
   @override
   Future<void> initialize(MapboxMap mapController,
-      {GeometryStyle? style}) async {
+      {GeometryStyle? style,
+      Function(GeometryChangeEvent event)? onChange}) async {
+    this.onChange = onChange;
+
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_circles');
 
@@ -49,6 +54,14 @@ class PointHandler extends GeometryHandler {
       final newCircleAnn =
           await _circleAnnotationManager!.create(annotationOption);
       _points.add(newCircleAnn);
+
+      if (onChange != null) {
+        onChange!(GeometryChangeEvent(
+          changeType: GeometryChangeType.add,
+          geometryType: GeometryType.point,
+        ));
+      }
+
       notifyListeners();
     } catch (e) {
       print('Error adding circle: $e');
@@ -86,8 +99,15 @@ class PointHandler extends GeometryHandler {
       if (_circleAnnotationManager != null) {
         await _circleAnnotationManager!.delete(circle);
         _points.removeWhere((p) => p.id == circle.id);
+
+        if (onChange != null) {
+          onChange!(GeometryChangeEvent(
+            changeType: GeometryChangeType.delete,
+            geometryType: GeometryType.point,
+          ));
+        }
+
         notifyListeners();
-        print('Circle deleted: $circle');
       }
     } catch (e) {
       print('Error deleting circle: $e');
