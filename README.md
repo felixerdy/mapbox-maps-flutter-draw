@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 ## API Overview
 
 ### MapboxDrawController
-- **`initialize(MapboxMap mapController)`**: Initializes the controller with a Mapbox map instance and sets up the point, line, and polygon handlers.
+- **`initialize(MapboxMap mapController, {Function(GeometryChangeEvent event)? onChange, GeometryStyles? styles})`**: Initializes the controller with a Mapbox map instance and sets up the point, line, and polygon handlers, optionally accepting a callback for geometry change events and custom styles for geometries.
 - **`toggleEditing(EditingMode mode)`**: Toggles the editing state and delegates to the appropriate handler based on the specified editing mode.
 - **`toggleDeleteMode()`**: Toggles delete mode, which allows for deletion of points, lines, or polygons.
 - **`addPoints(List<Point> existingPoints)`**: Adds existing points to the map by delegating to the `PointHandler`.
@@ -95,6 +95,24 @@ class _MyHomePageState extends State<MyHomePage> {
 - **`getAllPolygons()`**: Retrieves all polygons currently stored by delegating to the `PolygonHandler`.
 - **`undoLastAction()`**: Undoes the last action performed based on the current editing mode, delegating to the appropriate handler.
 - **`dispose()`**: Cleans up the annotation managers for points, lines, and polygons when the controller is no longer needed.
+
+### GeometryChangeEvent
+- **`GeometryChangeType type`**: The type of change that occurred (e.g., `add` or `delete`).
+- **`GeometryType geometry`**: The geometry that was changed (e.g., `point`, `line`, or `polygon`)
+
+### GeometryStyles
+- **`GeometryStyle? pointStyle`**: Styles specific to points.
+- **`GeometryStyle? lineStyle`**: Styles specific to lines.
+- **`GeometryStyle? polygonStyle`**: Styles specific to polygons.
+
+### GeometryStyle
+- **`Color? color`**: The fill color of the geometry.
+- **`double? width`**: The width of the geometry.
+- **`Color? strokeColor`**: The color of the geometry's stroke (outline).
+- **`double? strokeWidth`**: The width of the stroke (outline) of the geometry.
+- **`double? opacity`**: The opacity of the geometry.
+
+
 
 
 ## License

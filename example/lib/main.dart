@@ -63,7 +63,19 @@ class _MyHomePageState extends State<MyHomePage> {
               zoom: 3.0,
             ),
             onMapCreated: (mapInstance) async {
-              await _mapboxDrawController.initialize(mapInstance);
+              void onChangeHandler(GeometryChangeEvent event) {
+                print(event);
+              }
+
+              final geometryStyles = GeometryStyles(
+                  lineStyle: GeometryStyle(
+                color: Colors.red,
+                width: 4,
+                opacity: 0.8,
+              ));
+
+              await _mapboxDrawController.initialize(mapInstance,
+                  onChange: onChangeHandler, styles: geometryStyles);
 
               final pointStrings = [
                 '{"type":"Point","coordinates":[6.570985857967685,55.90719196736157]}',
