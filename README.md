@@ -41,50 +41,43 @@ dependencies:
 Please check out the [example](./example/) project for a full example.
 
 ```dart
-@override
-Widget build(BuildContext context) {
+class _MyHomePageState extends State<MyHomePage> {
+  late MapboxDrawController _mapboxDrawController;
+
+  @override
+  Widget build(BuildContext context) {
     _mapboxDrawController = Provider.of<MapboxDrawController>(context);
+    MapboxOptions.setAccessToken("YOUR_MAPBOX_ACCESS_TOKEN");
 
-    ...
-
-    // this is the mapbox_maps_flutter (https://github.com/mapbox/mapbox-maps-flutter) map
-    MapWidget(
+    return Scaffold(
+      body: MapWidget(
         styleUri: MapboxStyles.STANDARD,
         onMapCreated: (mapInstance) async {
-            await _mapboxDrawController.initialize(mapInstance);
+          await _mapboxDrawController.initialize(mapInstance);
 
-            // sample polygons
-            final polygonString = [
-                '{"type":"Polygon","bbox":null,"coordinates":[[[-18.930236903430682,65.54258945880892],[-41.305603332322534,56.12495372403541],[-23.143507455464942,47.51318115957886],[-13.42744079577011,50.491865810367415]]]}',
-                '{"type":"Polygon","bbox":null,"coordinates":[[[19.172957996449043,49.30508658266342],[12.380430916160435,33.47371340190411],[-2.592100951914972,35.36674553163404],[0.04248170102297877,51.60826115068258]]]}'
-            ];
+          // Add Points, Lines, and Polygons
+          final point = '{"type":"Point","coordinates":[6.57,55.90]}';
+          _mapboxDrawController.addPoints([Point.fromJson(jsonDecode(point))]);
 
-            _mapboxDrawController.addPolygons(
-                polygonString
-                    .map((e) => Polygon.fromJson(jsonDecode(e)))
-                    .toList(),
-              );
+          // ... do the same for lines and polygons
         },
-    ),
-    IconButton.filled(
-        icon: _mapboxDrawController.editingMode == EditingMode.DRAW_POLYGON
-            ? const Icon(Icons.done)
-            : const Icon(Icons.add),
-        onPressed: () =>
-            _mapboxDrawController.toggleEditing(),
-    ),
-    IconButton.filled(
-        icon: const Icon(Icons.undo),
-        onPressed: (_mapboxDrawController.polygonPoints.isEmpty)
-            ? null
-            : () => _mapboxDrawController.undoLastPoint(),
-    ),
-    IconButton.filled(
-        icon: const Icon(Icons.delete),
-        onPressed: () {
-            _mapboxDrawController.toggleDeleteMode();
-        },
-    )
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () => _mapboxDrawController.toggleEditing(EditingMode.DRAW_POINT),
+            child: const Icon(Icons.radio_button_checked),
+          ),
+          // ... do the same for lines and polygons
+          FloatingActionButton(
+            onPressed: () => _mapboxDrawController.undoLastAction(),
+            child: const Icon(Icons.undo),
+          ),
+        ],
+      ),
+    );
+  }
 }
 ```
 

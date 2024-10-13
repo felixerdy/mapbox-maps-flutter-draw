@@ -92,6 +92,8 @@ class PolygonHandler extends GeometryHandler {
     }
 
     try {
+      await _polygonAnnotationManager!.delete(_currentPolygon!);
+
       // Create the final polygon
       final newPoly = await _polygonAnnotationManager!.create(
         PolygonAnnotationOptions(

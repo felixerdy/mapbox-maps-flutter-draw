@@ -34,21 +34,21 @@ class GeometryStyles {
     return GeometryStyles(
       pointStyle: GeometryStyle(
           color: Colors.blue,
-          width: 5.0,
+          width: 6.0,
           strokeColor: Colors.white,
-          strokeWidth: 1.0,
+          strokeWidth: 2.0,
           opacity: 0.8),
       lineStyle: GeometryStyle(
           color: Colors.green,
-          width: 3.0,
+          width: 6.0,
           strokeColor: Colors.white,
           strokeWidth: 2.0,
           opacity: 0.8),
       polygonStyle: GeometryStyle(
           color: Colors.red,
-          width: 2.0,
+          width: 6.0,
           strokeColor: Colors.white,
-          strokeWidth: 1.5,
+          strokeWidth: 2,
           opacity: 0.8),
     );
   }
