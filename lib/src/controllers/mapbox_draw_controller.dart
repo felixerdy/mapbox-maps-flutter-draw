@@ -15,6 +15,9 @@ class MapboxDrawController with ChangeNotifier {
   EditingMode _editingMode = EditingMode.NONE;
   EditingMode get editingMode => _editingMode;
 
+  // Current Handler
+  GeometryHandler? _currentHandler;
+
   // Handlers
   late final PointHandler _pointHandler;
   late final LineHandler _lineHandler;
@@ -31,13 +34,22 @@ class MapboxDrawController with ChangeNotifier {
   }
 
   /// Initializes the controller with a MapboxMap instance.
-  Future<void> initialize(MapboxMap mapController) async {
+  Future<void> initialize(MapboxMap mapController,
+      {GeometryStyles? styles}) async {
     _setLoading(true);
     notifyListeners();
+
+    // Use default styles if none are provided
+    final GeometryStyles geometryStyles =
+        styles ?? GeometryStyles.defaultStyles();
+
     try {
-      await _pointHandler.initialize(mapController);
-      await _lineHandler.initialize(mapController);
-      await _polygonHandler.initialize(mapController);
+      await _pointHandler.initialize(mapController,
+          style: geometryStyles.pointStyle);
+      await _lineHandler.initialize(mapController,
+          style: geometryStyles.lineStyle);
+      await _polygonHandler.initialize(mapController,
+          style: geometryStyles.polygonStyle);
 
       mapController.setOnMapTapListener(MapTapHandler().handleMapTap);
     } catch (e) {
@@ -57,35 +69,20 @@ class MapboxDrawController with ChangeNotifier {
         // If already in the desired mode, toggle it off
         _editingMode = EditingMode.NONE;
         // Optionally, finalize the current editing mode
-        switch (mode) {
-          case EditingMode.DRAW_POINT:
-            // No finalization needed for points
-            break;
-          case EditingMode.DRAW_LINE:
-            await _lineHandler.finishDrawing();
-            break;
-          case EditingMode.DRAW_POLYGON:
-            await _polygonHandler.finishDrawing();
-            break;
-          case EditingMode.DELETE:
-            // Handle delete mode exit if necessary
-            break;
-          default:
-            break;
-        }
+        _currentHandler?.finishDrawing();
       } else {
         // Switch to the desired mode
         _editingMode = mode;
         // Start the corresponding handler's editing process
         switch (mode) {
           case EditingMode.DRAW_POINT:
-            // PointHandler doesn't need to start drawing explicitly
+            _currentHandler = _pointHandler;
             break;
           case EditingMode.DRAW_LINE:
-            await _lineHandler.startDrawing();
+            _currentHandler = _lineHandler;
             break;
           case EditingMode.DRAW_POLYGON:
-            await _polygonHandler.startDrawing();
+            _currentHandler = _polygonHandler;
             break;
           case EditingMode.DELETE:
             // Handle entering delete mode if necessary
@@ -93,6 +90,7 @@ class MapboxDrawController with ChangeNotifier {
           default:
             break;
         }
+        _currentHandler?.startDrawing();
       }
     } catch (e) {
       print('Error toggling editing: $e');
@@ -137,21 +135,7 @@ class MapboxDrawController with ChangeNotifier {
 
   /// Undo the last action by delegating to the appropriate handler
   Future<void> undoLastAction() async {
-    // Depending on the current mode, delegate to the respective handler
-    switch (_editingMode) {
-      case EditingMode.DRAW_POINT:
-        await _pointHandler.undoLastPoint();
-        break;
-      case EditingMode.DRAW_LINE:
-        await _lineHandler.undoLastPoint();
-        break;
-      case EditingMode.DRAW_POLYGON:
-        await _polygonHandler.undoLastPoint();
-        break;
-      // Handle other modes similarly
-      default:
-        break;
-    }
+    _currentHandler?.undoLastAction();
   }
 
   /// Sets the loading state.

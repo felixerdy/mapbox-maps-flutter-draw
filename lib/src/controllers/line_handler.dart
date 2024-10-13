@@ -2,7 +2,7 @@
 
 part of '../mapbox_maps_flutter_draw.dart';
 
-class LineHandler extends ChangeNotifier {
+class LineHandler extends GeometryHandler {
   final MapboxDrawController _controller;
 
   // Private Variables
@@ -15,28 +15,32 @@ class LineHandler extends ChangeNotifier {
   CircleAnnotationManager? _circleAnnotationManager;
   PolylineAnnotationManager? _polylineAnnotationManager;
 
-  LineHandler(this._controller);
+  LineHandler(this._controller) : super(_controller);
 
   /// Initializes line-related annotation managers.
-  Future<void> initialize(MapboxMap mapController) async {
+  @override
+  Future<void> initialize(MapboxMap mapController,
+      {GeometryStyle? style}) async {
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_line_circles');
 
     _circleAnnotationManager!
       ..setCircleEmissiveStrength(1)
       ..setCirclePitchAlignment(CirclePitchAlignment.MAP)
-      ..setCircleColor(Colors.green.value)
-      ..setCircleStrokeColor(Colors.white.value)
-      ..setCircleStrokeWidth(2)
-      ..setCircleRadius(6);
+      ..setCircleColor(style?.color?.value ?? Colors.green.value)
+      ..setCircleStrokeColor(style?.strokeColor?.value ?? Colors.white.value)
+      ..setCircleStrokeWidth(style?.strokeWidth ?? 2)
+      ..setCircleRadius(style?.width ?? 6);
 
     _polylineAnnotationManager = await mapController.annotations
         .createPolylineAnnotationManager(below: 'mapbox_draw_line_circles');
 
     _polylineAnnotationManager!
       ..setLineEmissiveStrength(1)
-      ..setLineColor(Colors.green.value)
-      ..setLineWidth(4);
+      ..setLineCap(LineCap.ROUND)
+      ..setLineColor(style?.color?.value ?? Colors.green.value)
+      ..setLineWidth(style?.width ?? 4)
+      ..setLineOpacity(style?.opacity ?? 0.8);
 
     _polylineAnnotationManager!.addOnPolylineAnnotationClickListener(
         _PolylineAnnotationClickListener(this));
@@ -161,7 +165,8 @@ class LineHandler extends ChangeNotifier {
   }
 
   /// Undoes the last added point and removes the corresponding circle.
-  Future<void> undoLastPoint() async {
+  @override
+  Future<void> undoLastAction() async {
     if (_linePoints.isEmpty || _controller.isLoading) return;
 
     _controller._setLoading(true);

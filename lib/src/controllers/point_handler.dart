@@ -2,7 +2,7 @@
 
 part of '../mapbox_maps_flutter_draw.dart';
 
-class PointHandler extends ChangeNotifier {
+class PointHandler extends GeometryHandler {
   final MapboxDrawController _controller;
 
   // Private Variables
@@ -11,20 +11,24 @@ class PointHandler extends ChangeNotifier {
   // Annotation Manager
   CircleAnnotationManager? _circleAnnotationManager;
 
-  PointHandler(this._controller);
+  PointHandler(this._controller) : super(_controller);
 
   /// Initializes point-related annotation managers.
-  Future<void> initialize(MapboxMap mapController) async {
+  @override
+  Future<void> initialize(MapboxMap mapController,
+      {GeometryStyle? style}) async {
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_circles');
 
     // Optionally, set default properties for circle annotations
     _circleAnnotationManager!
-      ..setCircleRadius(8)
-      ..setCircleColor(Colors.blue.value)
-      ..setCircleStrokeColor(Colors.white.value)
-      ..setCircleStrokeWidth(2)
-      ..setCirclePitchAlignment(CirclePitchAlignment.MAP);
+      ..setCirclePitchAlignment(CirclePitchAlignment.MAP)
+      ..setCircleRadius(style?.width ?? 6)
+      ..setCircleColor(style?.color?.value ?? Colors.blue.value)
+      ..setCircleStrokeColor(style?.strokeColor?.value ?? Colors.white.value)
+      ..setCircleStrokeWidth(style?.strokeWidth ?? 2)
+      ..setCircleOpacity(style?.opacity ?? 0.8)
+      ..setCircleStrokeOpacity(style?.opacity ?? 0.8);
 
     _circleAnnotationManager!.addOnCircleAnnotationClickListener(
         _PointAnnotationClickListener(this));
@@ -91,7 +95,8 @@ class PointHandler extends ChangeNotifier {
   }
 
   /// Undoes the last added circle.
-  Future<void> undoLastPoint() async {
+  @override
+  Future<void> undoLastAction() async {
     if (_points.isEmpty) return;
 
     try {
@@ -125,6 +130,16 @@ class PointHandler extends ChangeNotifier {
     MapTapHandler().removeTapListener(_onMapTapListener); // Remove listener
     _circleAnnotationManager?.deleteAll();
     super.dispose();
+  }
+
+  @override
+  Future<void> finishDrawing() {
+    return Future.value();
+  }
+
+  @override
+  Future<void> startDrawing() {
+    return Future.value();
   }
 }
 
