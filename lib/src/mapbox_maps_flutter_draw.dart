@@ -8,5 +8,8 @@ part 'controllers/polygon_handler.dart';
 part 'controllers/point_handler.dart';
 part 'controllers/line_handler.dart';
 part 'controllers/map_tap_handler.dart';
+part 'controllers/geometry_handler.dart';
+
+part 'models/geometry_styles.dart';
 
 // You can also include other shared utilities or models here if needed

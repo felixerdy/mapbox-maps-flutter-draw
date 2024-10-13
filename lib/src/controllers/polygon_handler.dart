@@ -2,7 +2,7 @@
 
 part of '../mapbox_maps_flutter_draw.dart';
 
-class PolygonHandler extends ChangeNotifier {
+class PolygonHandler extends GeometryHandler {
   final MapboxDrawController _controller;
 
   // Private Variables
@@ -15,27 +15,30 @@ class PolygonHandler extends ChangeNotifier {
   CircleAnnotationManager? _circleAnnotationManager;
   PolygonAnnotationManager? _polygonAnnotationManager;
 
-  PolygonHandler(this._controller);
+  PolygonHandler(this._controller) : super(_controller);
 
   /// Initializes polygon-related annotation managers.
-  Future<void> initialize(MapboxMap mapController) async {
+  Future<void> initialize(MapboxMap mapController,
+      {GeometryStyle? style}) async {
     _circleAnnotationManager = await mapController.annotations
         .createCircleAnnotationManager(id: 'mapbox_draw_polygon_circles');
 
     _circleAnnotationManager!
       ..setCircleEmissiveStrength(1)
       ..setCirclePitchAlignment(CirclePitchAlignment.MAP)
-      ..setCircleColor(Colors.redAccent.value)
-      ..setCircleStrokeColor(Colors.white.value)
-      ..setCircleStrokeWidth(2)
-      ..setCircleRadius(6);
+      ..setCircleColor(style?.color?.value ?? Colors.redAccent.value)
+      ..setCircleStrokeColor(style?.strokeColor?.value ?? Colors.white.value)
+      ..setCircleStrokeWidth(style?.strokeWidth ?? 2)
+      ..setCircleRadius(style?.width ?? 6);
 
     _polygonAnnotationManager = await mapController.annotations
         .createPolygonAnnotationManager(below: 'mapbox_draw_polygon_circles');
 
     _polygonAnnotationManager!
       ..setFillEmissiveStrength(1)
-      ..setFillColor(Colors.redAccent.value);
+      ..setFillColor(style?.color?.value ?? Colors.redAccent.value)
+      ..setFillOutlineColor(style?.strokeColor?.value ?? Colors.white.value)
+      ..setFillOpacity(style?.opacity ?? 0.8);
 
     _polygonAnnotationManager!
         .addOnPolygonAnnotationClickListener(_AnnotationClickListener(this));
@@ -89,6 +92,8 @@ class PolygonHandler extends ChangeNotifier {
     }
 
     try {
+      await _polygonAnnotationManager!.delete(_currentPolygon!);
+
       // Create the final polygon
       final newPoly = await _polygonAnnotationManager!.create(
         PolygonAnnotationOptions(
@@ -172,7 +177,8 @@ class PolygonHandler extends ChangeNotifier {
   }
 
   /// Undoes the last added point and removes the corresponding circle.
-  Future<void> undoLastPoint() async {
+  @override
+  Future<void> undoLastAction() async {
     if (_polygonPoints.isEmpty || _controller.isLoading) return;
 
     _controller._setLoading(true);
