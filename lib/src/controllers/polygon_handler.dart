@@ -60,6 +60,12 @@ class PolygonHandler extends GeometryHandler {
       return;
     }
 
+    await _circleAnnotationManager?.deleteAll();
+    _circleAnnotations.clear();
+    _polygonPoints.clear();
+    _currentPolygon = null;
+    polygons.clear();
+
     for (final polygon in existingPolygons) {
       try {
         final annotationOption = PolygonAnnotationOptions(
@@ -81,6 +87,7 @@ class PolygonHandler extends GeometryHandler {
   }
 
   /// Starts the polygon drawing process.
+  @override
   Future<void> startDrawing() async {
     // Reset any existing drawing state
     _currentPolygon = null;
@@ -91,23 +98,22 @@ class PolygonHandler extends GeometryHandler {
   }
 
   /// Finishes the polygon drawing process.
-  Future<void> finishDrawing() async {
-    if (_polygonPoints.length < 3) {
-      print('A polygon requires at least 3 points.');
-      return;
-    }
-
+  @override
+  Future<void> finishDrawing({bool fromDelete = false}) async {
     try {
-      await _polygonAnnotationManager!.delete(_currentPolygon!);
+      if (_currentPolygon != null) {
+        await _polygonAnnotationManager!.delete(_currentPolygon!);
+      }
+      if (_polygonPoints.length >= 3) {
+        // Create the final polygon
+        final newPoly = await _polygonAnnotationManager!.create(
+          PolygonAnnotationOptions(
+            geometry: Polygon.fromPoints(points: [_polygonPoints.toList()]),
+          ),
+        );
 
-      // Create the final polygon
-      final newPoly = await _polygonAnnotationManager!.create(
-        PolygonAnnotationOptions(
-          geometry: Polygon.fromPoints(points: [_polygonPoints.toList()]),
-        ),
-      );
-
-      polygons.add(newPoly);
+        polygons.add(newPoly);
+      }
 
       // Clean up
       await _circleAnnotationManager!.deleteAll();
@@ -117,7 +123,9 @@ class PolygonHandler extends GeometryHandler {
 
       if (onChange != null) {
         onChange!(GeometryChangeEvent(
-          changeType: GeometryChangeType.add,
+          changeType: fromDelete == true
+              ? GeometryChangeType.delete
+              : GeometryChangeType.add,
           geometryType: GeometryType.polygon,
         ));
       }
@@ -235,6 +243,7 @@ class PolygonHandler extends GeometryHandler {
     MapTapHandler().removeTapListener(_onMapTapListener);
     _polygonAnnotationManager?.deleteAll();
     _circleAnnotationManager?.deleteAll();
+    polygons.clear();
   }
 }
 

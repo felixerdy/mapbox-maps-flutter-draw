@@ -12,7 +12,7 @@ abstract class GeometryHandler extends ChangeNotifier {
 
   Future<void> startDrawing();
 
-  Future<void> finishDrawing();
+  Future<void> finishDrawing({bool fromDelete = false});
 
   Future<void> undoLastAction();
 

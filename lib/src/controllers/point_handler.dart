@@ -75,6 +75,9 @@ class PointHandler extends GeometryHandler {
       return;
     }
 
+    _circleAnnotationManager!.deleteAll();
+    _points.clear();
+
     try {
       for (final point in existingPoints) {
         final annotationOption = CircleAnnotationOptions(geometry: point);
@@ -153,7 +156,7 @@ class PointHandler extends GeometryHandler {
   }
 
   @override
-  Future<void> finishDrawing() {
+  Future<void> finishDrawing({bool fromDelete = false}) async {
     return Future.value();
   }
 
