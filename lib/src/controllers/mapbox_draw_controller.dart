@@ -70,7 +70,7 @@ class MapboxDrawController with ChangeNotifier {
         // If already in the desired mode, toggle it off
         _editingMode = EditingMode.NONE;
         // Optionally, finalize the current editing mode
-        _currentHandler?.finishDrawing();
+        _currentHandler?.finishDrawing(fromDelete: mode == EditingMode.DELETE);
       } else {
         // Switch to the desired mode
         _editingMode = mode;

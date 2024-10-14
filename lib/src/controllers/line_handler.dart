@@ -67,22 +67,21 @@ class LineHandler extends GeometryHandler {
 
   /// Finishes the line drawing process.
   @override
-  Future<void> finishDrawing() async {
-    if (_linePoints.length < 2) {
-      print('A line requires at least 2 points.');
-      return;
-    }
-
+  Future<void> finishDrawing({bool fromDelete = false}) async {
     try {
-      // Create the final line
-      final newLine = await _polylineAnnotationManager!.create(
-        PolylineAnnotationOptions(
-          geometry: LineString.fromPoints(points: _linePoints),
-        ),
-      );
+      if (_currentLine != null) {
+        await _polylineAnnotationManager!.delete(_currentLine!);
+      }
+      if (_linePoints.length >= 2) {
+        // Create the final line
+        final newLine = await _polylineAnnotationManager!.create(
+          PolylineAnnotationOptions(
+            geometry: LineString.fromPoints(points: _linePoints),
+          ),
+        );
 
-      lines.add(newLine);
-
+        lines.add(newLine);
+      }
       // Clean up
       await _circleAnnotationManager!.deleteAll();
       _circleAnnotations.clear();
@@ -91,7 +90,8 @@ class LineHandler extends GeometryHandler {
 
       if (onChange != null) {
         onChange!(GeometryChangeEvent(
-            changeType: GeometryChangeType.add,
+            changeType:
+                fromDelete ? GeometryChangeType.delete : GeometryChangeType.add,
             geometryType: GeometryType.line));
       }
 
@@ -142,6 +142,13 @@ class LineHandler extends GeometryHandler {
   }
 
   Future<void> addLines(List<LineString> existingLines) async {
+    _polylineAnnotationManager?.deleteAll();
+    lines.clear();
+    _circleAnnotationManager?.deleteAll();
+    _circleAnnotations.clear();
+    _linePoints.clear();
+    _currentLine = null;
+
     for (var line in existingLines) {
       try {
         final newLine = await _polylineAnnotationManager!.create(
