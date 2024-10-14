@@ -1,3 +1,7 @@
+# 0.2.1
+
+* fix: clear data before add
+
 ## 0.2.0
 
 * feat: style geometries colors, stroke, opacity, ...
